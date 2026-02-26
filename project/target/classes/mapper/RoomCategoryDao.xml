@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.dao.RoomCategoryDao">
+
+    <resultMap id="BaseResultMap" type="com.hotel.entity.RoomCategory">
+        <id column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="description" property="description"/>
+        <result column="price_min" property="priceMin"/>
+        <result column="price_max" property="priceMax"/>
+        <result column="cover_img" property="coverImg"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="findById" resultMap="BaseResultMap" parameterType="long">
+        SELECT * FROM room_category WHERE category_id = #{categoryId}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM room_category WHERE status = 1 ORDER BY sort ASC, category_id DESC
+    </select>
+
+    <select id="findByConditions" resultMap="BaseResultMap">
+        SELECT * FROM room_category
+        <where>
+            <if test="categoryName != null and categoryName != ''">
+                AND category_name LIKE CONCAT('%', #{categoryName}, '%')
+            </if>
+            <if test="priceMin != null">
+                AND price_max >= #{priceMin}
+            </if>
+            <if test="priceMax != null">
+                AND price_min <![CDATA[<=]]> #{priceMax}
+            </if>
+            AND status = 1
+        </where>
+        ORDER BY sort ASC, category_id DESC
+    </select>
+
+    <select id="findByConditionsPaged" resultMap="BaseResultMap">
+        SELECT * FROM room_category
+        <where>
+            <if test="categoryName != null and categoryName != ''">
+                AND category_name LIKE CONCAT('%', #{categoryName}, '%')
+            </if>
+            <if test="priceMin != null">
+                AND price_max >= #{priceMin}
+            </if>
+            <if test="priceMax != null">
+                AND price_min <![CDATA[<=]]> #{priceMax}
+            </if>
+            AND status = 1
+        </where>
+        ORDER BY sort ASC, category_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countByConditions" resultType="int">
+        SELECT COUNT(*) FROM room_category
+        <where>
+            <if test="categoryName != null and categoryName != ''">
+                AND category_name LIKE CONCAT('%', #{categoryName}, '%')
+            </if>
+            <if test="priceMin != null">
+                AND price_max >= #{priceMin}
+            </if>
+            <if test="priceMax != null">
+                AND price_min <![CDATA[<=]]> #{priceMax}
+            </if>
+            AND status = 1
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.hotel.entity.RoomCategory" useGeneratedKeys="true" keyProperty="categoryId">
+        INSERT INTO room_category (category_name, description, price_min, price_max, cover_img, sort, status, create_time, update_time, remark)
+        VALUES (#{categoryName}, #{description}, #{priceMin}, #{priceMax}, #{coverImg}, #{sort}, #{status}, #{createTime}, #{updateTime}, #{remark})
+    </insert>
+
+    <update id="update" parameterType="com.hotel.entity.RoomCategory">
+        UPDATE room_category SET
+            category_name = #{categoryName},
+            description = #{description},
+            price_min = #{priceMin},
+            price_max = #{priceMax},
+            cover_img = #{coverImg},
+            sort = #{sort},
+            status = #{status},
+            update_time = #{updateTime},
+            remark = #{remark}
+        WHERE category_id = #{categoryId}
+    </update>
+
+    <update id="updateSelective" parameterType="com.hotel.entity.RoomCategory">
+        UPDATE room_category
+        <set>
+            <if test="categoryName != null">category_name = #{categoryName},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="priceMin != null">price_min = #{priceMin},</if>
+            <if test="priceMax != null">price_max = #{priceMax},</if>
+            <if test="coverImg != null">cover_img = #{coverImg},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE category_id = #{categoryId}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM room_category WHERE category_id = #{categoryId}
+    </delete>
+
+</mapper>
+

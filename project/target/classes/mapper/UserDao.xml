@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.dao.UserDao">
+
+    <resultMap id="BaseResultMap" type="com.hotel.entity.User">
+        <id column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="real_name" property="realName"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="avatar" property="avatar"/>
+        <result column="user_type" property="userType"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="findByUserName" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE user_name = #{userName} AND status = 1
+    </select>
+
+    <select id="findByUserNameAndPassword" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE user_name = #{userName} AND password = #{password} AND status = 1
+    </select>
+
+    <select id="findById" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" parameterType="com.hotel.entity.User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user (
+            user_name, password, real_name, phone, email, avatar,
+            user_type, status, create_time, update_time, remark
+        ) VALUES (
+            #{userName}, #{password}, #{realName}, #{phone}, #{email}, #{avatar},
+            #{userType}, #{status}, #{createTime}, #{updateTime}, #{remark}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.hotel.entity.User">
+        UPDATE user SET
+            user_name = #{userName},
+            password = #{password},
+            real_name = #{realName},
+            phone = #{phone},
+            email = #{email},
+            avatar = #{avatar},
+            user_type = #{userType},
+            status = #{status},
+            update_time = #{updateTime},
+            remark = #{remark}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateSelective" parameterType="com.hotel.entity.User">
+        UPDATE user
+        <set>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="userType != null">user_type = #{userType},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+    
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM user WHERE user_id = #{userId}
+    </delete>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM user ORDER BY user_id DESC
+    </select>
+
+    <select id="findByUserType" parameterType="int" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE user_type = #{userType} ORDER BY user_id DESC
+    </select>
+
+    <select id="findByConditions" resultMap="BaseResultMap">
+        SELECT * FROM user
+        <where>
+            <if test="userName != null and userName != ''">
+                AND user_name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="realName != null and realName != ''">
+                AND real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            AND user_type = #{userType}
+        </where>
+        ORDER BY user_id DESC
+    </select>
+
+    <select id="findByConditionsPaged" resultMap="BaseResultMap">
+        SELECT * FROM user
+        <where>
+            <if test="userName != null and userName != ''">
+                AND user_name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="realName != null and realName != ''">
+                AND real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            AND user_type = #{userType}
+        </where>
+        ORDER BY user_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countByConditions" resultType="int">
+        SELECT COUNT(*) FROM user
+        <where>
+            <if test="userName != null and userName != ''">
+                AND user_name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="realName != null and realName != ''">
+                AND real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            AND user_type = #{userType}
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.dao.OrderDao">
+
+    <resultMap id="BaseResultMap" type="com.hotel.entity.Order">
+        <id column="order_id" property="orderId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="user_id" property="userId"/>
+        <result column="user_name" property="userName"/>
+        <result column="room_id" property="roomId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="guest_name" property="guestName"/>
+        <result column="guest_phone" property="phone"/>
+        <result column="check_in_date" property="checkInDate"/>
+        <result column="check_out_date" property="checkOutDate"/>
+        <result column="stay_days" property="stayDays"/>
+        <result column="room_price" property="roomPrice"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="order_status" property="orderStatus"/>
+        <result column="cancel_reason" property="cancelReason"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="findById" resultMap="BaseResultMap" parameterType="long">
+        SELECT * FROM `order_info` WHERE order_id = #{orderId}
+    </select>
+
+    <select id="findByOrderNo" resultMap="BaseResultMap" parameterType="string">
+        SELECT * FROM `order_info` WHERE order_no = #{orderNo}
+    </select>
+
+    <select id="findByUserId" resultMap="BaseResultMap" parameterType="long">
+        SELECT * FROM `order_info` WHERE user_id = #{userId} ORDER BY create_time DESC
+    </select>
+
+    <select id="findByUserIdPaged" resultMap="BaseResultMap">
+        SELECT * FROM `order_info` WHERE user_id = #{userId} ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByUserId" resultType="int" parameterType="long">
+        SELECT COUNT(*) FROM `order_info` WHERE user_id = #{userId}
+    </select>
+
+    <select id="findByUserIdAndStatus" resultMap="BaseResultMap">
+        SELECT * FROM `order_info` WHERE user_id = #{userId} AND order_status = #{status}
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByUserIdAndStatus" resultType="int">
+        SELECT COUNT(*) FROM `order_info` WHERE user_id = #{userId} AND order_status = #{status}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM `order_info` ORDER BY create_time DESC
+    </select>
+
+    <select id="findPageByConditions" resultMap="BaseResultMap">
+        SELECT o.*, u.user_name as userName
+        FROM `order_info` o
+        LEFT JOIN user u ON o.user_id = u.user_id
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND o.order_no LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="guestName != null and guestName != ''">
+                AND o.guest_name LIKE CONCAT('%', #{guestName}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND o.guest_phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="userName != null and userName != ''">
+                AND u.user_name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="orderStatus != null">
+                AND o.order_status = #{orderStatus}
+            </if>
+        </where>
+        ORDER BY o.create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByConditions" resultType="int">
+        SELECT COUNT(*)
+        FROM `order_info` o
+        LEFT JOIN user u ON o.user_id = u.user_id
+        <where>
+            <if test="orderNo != null and orderNo != ''">
+                AND o.order_no LIKE CONCAT('%', #{orderNo}, '%')
+            </if>
+            <if test="guestName != null and guestName != ''">
+                AND o.guest_name LIKE CONCAT('%', #{guestName}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND o.guest_phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="userName != null and userName != ''">
+                AND u.user_name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="orderStatus != null">
+                AND o.order_status = #{orderStatus}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.hotel.entity.Order" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO `order_info` (order_no, user_id, room_id, category_id, guest_name, guest_phone, check_in_date, check_out_date, stay_days, room_price, total_price, order_status, create_time, update_time, remark)
+        VALUES (#{orderNo}, #{userId}, #{roomId}, #{categoryId}, #{guestName}, #{phone}, #{checkInDate}, #{checkOutDate}, #{stayDays}, #{roomPrice}, #{totalPrice}, #{orderStatus}, #{createTime}, #{updateTime}, #{remark})
+    </insert>
+
+    <update id="update" parameterType="com.hotel.entity.Order">
+        UPDATE `order_info` SET
+            order_no = #{orderNo},
+            user_id = #{userId},
+            room_id = #{roomId},
+            category_id = #{categoryId},
+            guest_name = #{guestName},
+            guest_phone = #{phone},
+            check_in_date = #{checkInDate},
+            check_out_date = #{checkOutDate},
+            stay_days = #{stayDays},
+            room_price = #{roomPrice},
+            total_price = #{totalPrice},
+            order_status = #{orderStatus},
+            cancel_reason = #{cancelReason},
+            update_time = #{updateTime},
+            remark = #{remark}
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updateSelective" parameterType="com.hotel.entity.Order">
+        UPDATE `order_info`
+        <set>
+            <if test="orderNo != null">order_no = #{orderNo},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="roomId != null">room_id = #{roomId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="guestName != null">guest_name = #{guestName},</if>
+            <if test="phone != null">guest_phone = #{phone},</if>
+            <if test="checkInDate != null">check_in_date = #{checkInDate},</if>
+            <if test="checkOutDate != null">check_out_date = #{checkOutDate},</if>
+            <if test="stayDays != null">stay_days = #{stayDays},</if>
+            <if test="roomPrice != null">room_price = #{roomPrice},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+            <if test="orderStatus != null">order_status = #{orderStatus},</if>
+            <if test="cancelReason != null">cancel_reason = #{cancelReason},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE order_id = #{orderId}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM `order_info` WHERE order_id = #{orderId}
+    </delete>
+
+</mapper>

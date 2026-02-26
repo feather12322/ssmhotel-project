@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hotel.dao.RoomInfoDao">
+
+    <resultMap id="BaseResultMap" type="com.hotel.entity.RoomInfo">
+        <id column="room_id" property="roomId"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="room_no" property="roomNo"/>
+        <result column="area" property="area"/>
+        <result column="bed_type" property="bedType"/>
+        <result column="price" property="price"/>
+        <result column="facilities" property="facilities"/>
+        <result column="cover_img" property="coverImg"/>
+        <result column="detail_imgs" property="detailImgs"/>
+        <result column="room_status" property="roomStatus"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="findById" resultMap="BaseResultMap" parameterType="long">
+        SELECT * FROM room_info WHERE room_id = #{roomId}
+    </select>
+
+    <select id="findByCategoryId" resultMap="BaseResultMap" parameterType="long">
+        SELECT * FROM room_info WHERE category_id = #{categoryId} AND room_status != 0
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM room_info ORDER BY room_id DESC
+    </select>
+
+    <select id="findByConditions" resultMap="BaseResultMap">
+        SELECT * FROM room_info
+        <where>
+            <if test="roomNo != null and roomNo != ''">
+                AND room_no LIKE CONCAT('%', #{roomNo}, '%')
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="priceMin != null">
+                AND price >= #{priceMin}
+            </if>
+            <if test="priceMax != null">
+                AND price <![CDATA[<=]]> #{priceMax}
+            </if>
+            <if test="roomStatus != null">
+                AND room_status = #{roomStatus}
+            </if>
+        </where>
+        ORDER BY room_id DESC
+    </select>
+
+    <select id="findByConditionsPaged" resultMap="BaseResultMap">
+        SELECT * FROM room_info
+        <where>
+            <if test="roomNo != null and roomNo != ''">
+                AND room_no LIKE CONCAT('%', #{roomNo}, '%')
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="priceMin != null">
+                AND price >= #{priceMin}
+            </if>
+            <if test="priceMax != null">
+                AND price <![CDATA[<=]]> #{priceMax}
+            </if>
+            <if test="roomStatus != null">
+                AND room_status = #{roomStatus}
+            </if>
+        </where>
+        ORDER BY room_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countByConditions" resultType="int">
+        SELECT COUNT(*) FROM room_info
+        <where>
+            <if test="roomNo != null and roomNo != ''">
+                AND room_no LIKE CONCAT('%', #{roomNo}, '%')
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="priceMin != null">
+                AND price >= #{priceMin}
+            </if>
+            <if test="priceMax != null">
+                AND price <![CDATA[<=]]> #{priceMax}
+            </if>
+            <if test="roomStatus != null">
+                AND room_status = #{roomStatus}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.hotel.entity.RoomInfo" useGeneratedKeys="true" keyProperty="roomId">
+        INSERT INTO room_info (category_id, room_no, area, bed_type, price, facilities, cover_img, detail_imgs, room_status, create_time, update_time, remark)
+        VALUES (#{categoryId}, #{roomNo}, #{area}, #{bedType}, #{price}, #{facilities}, #{coverImg}, #{detailImgs}, #{roomStatus}, #{createTime}, #{updateTime}, #{remark})
+    </insert>
+
+    <update id="update" parameterType="com.hotel.entity.RoomInfo">
+        UPDATE room_info SET
+            category_id = #{categoryId},
+            room_no = #{roomNo},
+            area = #{area},
+            bed_type = #{bedType},
+            price = #{price},
+            facilities = #{facilities},
+            cover_img = #{coverImg},
+            detail_imgs = #{detailImgs},
+            room_status = #{roomStatus},
+            update_time = #{updateTime},
+            remark = #{remark}
+        WHERE room_id = #{roomId}
+    </update>
+
+    <update id="updateSelective" parameterType="com.hotel.entity.RoomInfo">
+        UPDATE room_info
+        <set>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="roomNo != null">room_no = #{roomNo},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="bedType != null">bed_type = #{bedType},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="facilities != null">facilities = #{facilities},</if>
+            <if test="coverImg != null">cover_img = #{coverImg},</if>
+            <if test="detailImgs != null">detail_imgs = #{detailImgs},</if>
+            <if test="roomStatus != null">room_status = #{roomStatus},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        WHERE room_id = #{roomId}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM room_info WHERE room_id = #{roomId}
+    </delete>
+
+</mapper>
+
